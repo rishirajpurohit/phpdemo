@@ -1,34 +1,44 @@
 <?php
+include 'auth.php';
 
-include "mathfunctions.php";
+session_start();
 
-
-if(isset($_POST['add'])){
-	$first = $_POST['first'];
-	$second = $_POST['second'];
-  	
-  	$math = new mathematica();
-	$result = $math->calresult($first,$second,"add");
+//this means logged in
+if(isset($_SESSION["userlogin"])){
+	if($_SESSION["userlogin"] == true){
+	//echo "youa are alread logged in";
+	header("Location: dashboard.php");
+	}
 }
+
+//login logic
+if(isset($_POST['login'])){
+	$username = $_POST["username"];
+	$passwrd = $_POST["pass"];
+
+	$user_obj = new User();
+	if($user_obj->is_valid($username,$passwrd)){
+		$_SESSION["userlogin"] = true;
+		$_SESSION["name"] = $username;
+	}else{
+		//error msg
+		$_SESSION["userlogin"] = false;
+	}
+}
+
 
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Calculator</title>
+	<title>Login</title>
 </head>
 <body>
-	<form method='post'>
-		<input type="number" name="first" placeholder="first number" />
-		<input type="number" name="second" placeholder="Second number" />
-		<input type="submit" name="add" value="add" />
+	<form method="POST">
+		<input type="text" name="username">
+		<input type="text" name="pass">
+		<input type="submit" name="login">
 	</form>
-	<div id="res_box">
-		<span>Result : </span>
-		<span>
-			<?php echo isset($result)?$result:"will be available on submit";?>
-	</span>
-	</div>
 </body>
 </html>
